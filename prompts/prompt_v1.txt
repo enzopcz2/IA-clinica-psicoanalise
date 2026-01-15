@@ -1,0 +1,4 @@
+Analise o texto clínico abaixo e produza uma análise psicológica.
+
+Texto:
+{INPUT}
