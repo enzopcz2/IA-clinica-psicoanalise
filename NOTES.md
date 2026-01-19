@@ -77,5 +77,4 @@ Os principais desafios em sistemas desse tipo são:
 
 Esses desafios exigem decisões éticas e técnicas cuidadosas.
 
-📌 Este projeto foi desenvolvido como um case técnico, com foco em clareza,
-robustez e responsabilidade no uso de modelos de linguagem para análise clínica.
+📌 Este projeto foi desenvolvido como um case técnico, com foco em clareza, robustez e responsabilidade no uso de modelos de linguagem.
