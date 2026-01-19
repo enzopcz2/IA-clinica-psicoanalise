@@ -45,15 +45,17 @@ O prompt ativo é definido no main():
 def main(prompt_version: str = "v2"):
 ```
 
-Para trocar o prompt, basta alterar o valor.
+Para trocar o prompt, basta alterar o valor de v2 para v1, ou vice-versa.
 
-Além disso, coloque os textos clinicos dentro de
+O programa suporta 2 textos clínicos para análise por vez, coloque eles dentro dos arquivos:
 
 ```text
-prompts/
-├── prompt_v1.txt
-└── prompt_v2.txt
+data/input
+├── text_1.txt
+└── text_2.txt
 ```
+
+Caso possua apenas 1 texto, deixe o outro arquivo em branco.
 
 ### 4️⃣ Executar o pipeline
 
@@ -92,16 +94,20 @@ Esse desenho evita falhas silenciosas e impede inferências clínicas a partir d
 
 ### 🧩 Como escolher o prompt
 Os prompts ficam no diretório:
+
 ```text
 prompts/
 ├── prompt_v1.txt
 └── prompt_v2.txt
 ```
+
 Cada prompt pode definir:
 - nível de detalhamento clínico
 - estilo da análise
 - grau de cautela na avaliação de risco
-Isso permite experimentação controlada sem alterar o código.
+
+Isso permite experimentação controlada sem alterar o código. 
+
 As versões dos prompts são melhor explicadas em NOTES.md
 ## 📊 Como interpretar os resultados
 O arquivo results.json possui a seguinte estrutura geral:
@@ -132,4 +138,4 @@ at ('risk_assessment', 'signals')
 Isso significa que o modelo não encontrou sinais clínicos suficientes, o pipeline optou por não inferir risco indevidamente. Esse comportamento é intencional e desejável. O sistema prioriza rigor clínico em vez de forçar inferências a partir de dados pobres.
 
 📌 Este projeto foi desenvolvido como um case técnico, com foco em clareza,
-robustez e responsabilidade no uso de modelos de linguagem para análise clínica.
+robustez e responsabilidade no uso de modelos de linguagem.
