@@ -1,17 +1,17 @@
+# Imports utilizados
 from __future__ import annotations 
 from openai import OpenAI
 import os
 import json 
 from pathlib import Path 
 from typing import Any, Dict, List, Tuple, Optional, Literal, TypedDict 
- 
-# Imports obrigatórios para o novo escopo 
 try: 
     from pydantic import BaseModel, Field, ValidationError 
     from langgraph.graph import StateGraph, END 
 except ImportError: 
     raise ImportError("Dependências ausentes. Instale: pip install pydantic langgraph") 
- 
+
+# Variáveis globais
 BASE_DIR = Path(__file__).parent 
 INPUT_DIR = BASE_DIR / "data" / "input" 
 PROMPTS_DIR = BASE_DIR / "prompts" 
@@ -19,7 +19,7 @@ OUT_PATH = BASE_DIR / "results.json"
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ========================= 
-# 1. Pydantic Schemas (Structured Output) 
+# 1. Esquemas Pydantic
 # ========================= 
  
 class RiskAssessment(BaseModel):
@@ -78,7 +78,7 @@ class ClinicalOutput(BaseModel):
  
  
 # ========================= 
-# 2. State Definition 
+# 2. Definição do Estado
 # ========================= 
  
 class ClinicalState(TypedDict): 
@@ -97,7 +97,7 @@ class ClinicalState(TypedDict):
  
  
 # ========================= 
-# 3. IO / Prompt Helpers 
+# 3. Funções para leitura e escritas de arquivos
 # ========================= 
  
 def load_prompt(prompt_version: str) -> str: 
@@ -135,7 +135,7 @@ def read_inputs(input_dir: Path) -> List[Tuple[str, str]]:
  
  
 # ========================= 
-# 4. Model Call (Mock or API) 
+# 4. Chamada do modelo
 # ========================= 
  
 def call_model(prompt: str) -> str:
@@ -153,8 +153,7 @@ def call_model(prompt: str) -> str:
         max_output_tokens=800
     )
 
-    # A Responses API pode retornar múltiplos blocos;
-    # usamos a forma segura de extrair texto final
+    # Resposta obtida pelo modelo
     return response.output_text
  
  
@@ -175,7 +174,7 @@ def generation_node(state: ClinicalState) -> ClinicalState:
         # 2. Injeta o texto clínico
         prompt = template.replace("{INPUT}", state["input_text"])
 
-        # 3. Chama o modelo (mock ou API)
+        # 3. Chama o modelo
         response = call_model(prompt)
 
         return {
@@ -201,8 +200,7 @@ def validation_node(state: ClinicalState) -> ClinicalState:
     parsed_obj = None 
  
     try: 
-        # A mágica do Pydantic acontece aqui: 
-        # Ele faz o parse E valida tipos/regras definidos na classe ClinicalOutput 
+        # Faz o parse e valida tipos/regras definidos na classe ClinicalOutput 
         parsed_obj = ClinicalOutput.model_validate_json(raw) 
          
     except ValidationError as e: 
@@ -223,21 +221,19 @@ e.errors()]
  
  
 # ========================= 
-# 6. Graph Construction 
+# 6. Construção do grafo 
 # ========================= 
  
 def build_graph() -> StateGraph: 
     workflow = StateGraph(ClinicalState) 
-     
     # Adiciona nós 
     workflow.add_node("generator", generation_node) 
     workflow.add_node("validator", validation_node) 
-     
+    
     # Define fluxo linear 
     workflow.set_entry_point("generator") 
     workflow.add_edge("generator", "validator") 
     workflow.add_edge("validator", END) 
-     
     return workflow.compile() 
  
  
@@ -247,18 +243,18 @@ def save_results(payload: Dict[str, Any], path: Path) -> None:
  
  
 # ========================= 
-# 7. Main Execution 
+# 7. Execução main
 # ========================= 
  
 def main(prompt_version: str = "v2"): 
-    # 1. Leitura 
+    # Leitura do arquivo
     try: 
         items = read_inputs(INPUT_DIR) 
     except NotImplementedError: 
         print("Erro: read_inputs não implementado. Usando inputs mockados.") 
         items = [("test_mock.txt", "Texto de exemplo para teste do fluxo.")] 
  
-    # 2. Setup do Grafo 
+    # Setup do grafo
     app = build_graph() 
     results = [] 
     ok_count = 0 
@@ -309,7 +305,7 @@ def main(prompt_version: str = "v2"):
                 "output": None 
             }) 
  
-    # 3. Consolidação 
+    # Consolidação 
     payload = { 
         "prompt_version": prompt_version, 
         "total": len(results), 

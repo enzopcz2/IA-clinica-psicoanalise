@@ -1,4 +1,4 @@
-Analise o texto clínico abaixo e produza uma análise psicológica.
-
+Analise o texto clínico abaixo e produza uma análise psicológica qualitativa.
+Considere aspectos emocionais, comportamentais e relacionais presentes no discurso.
 Texto:
 {INPUT}
